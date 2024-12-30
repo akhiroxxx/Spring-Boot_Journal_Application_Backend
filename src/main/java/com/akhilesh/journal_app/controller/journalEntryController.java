@@ -1,13 +1,8 @@
 package com.akhilesh.journal_app.controller;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -44,23 +39,23 @@ public class journalEntryController {
   }
 
   @GetMapping("/id/{myId}")
-  public JournalEntry getJournalyById(@PathVariable String myId){
-    Optional<JournalEntry> j = journalEntryService.getJournalEntryById(myId);
-    if(j.isPresent())
-    return j.get();
+  public JournalEntry getJournalyById(@PathVariable ObjectId myId){
+    JournalEntry j = journalEntryService.getJournalEntryById(myId);
+    if(j!=null)
+    return j;
     else
     return null;
   }
 
   @DeleteMapping("/id/{myId}")
-  public JournalEntry deleteJournalById(@PathVariable String myId){
+  public JournalEntry deleteJournalById(@PathVariable ObjectId myId){
     return journalEntryService.deleteJournalEntryById(myId);
     // return journalEntries.remove(myId);
   }
 
   @PutMapping("/id/{myId}")
-  public JournalEntry updateJournalById(@PathVariable String myId, @RequestBody JournalEntry myEntry){
-    // saves new entry if id matches with existing and returns the previous existing
+  public JournalEntry updateJournalById(@PathVariable ObjectId myId, @RequestBody JournalEntry myEntry){
+    // saves new entry if id matches with existing and returns the new one only
     return journalEntryService.updateJournalEntryById(myId, myEntry);
   }
 }

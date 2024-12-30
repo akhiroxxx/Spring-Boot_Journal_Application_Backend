@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,36 +26,28 @@ public class JournalEntryService {
       repo.save(journalEntry);
     }
 
-    public Optional<JournalEntry> getJournalEntryById(String id){
-      return repo.getJournalEntryById(id);
+    public JournalEntry getJournalEntryById(ObjectId id){
+      return repo.findById(id).orElse(null);
     }
 
-    public JournalEntry deleteJournalEntryById(String id){
-      Optional<JournalEntry> j = getJournalEntryById(id);
-      if(j.isPresent()){
-        repo.delete(j.get());
-        return j.get();
+    public JournalEntry deleteJournalEntryById(ObjectId id){
+      JournalEntry j = getJournalEntryById(id);
+      if(j!=null){
+        repo.deleteById(j.getId());
+        return j;
       }
       else
       return null;
     }
 
-    public JournalEntry updateJournalEntryById(String myId, JournalEntry myEntry) {
-      if(!myEntry.getId().equals(myId)){
-        System.out.println(myEntry.getId()==myId);
-        System.out.println(myId+" "+myId.getClass().getName());
-        System.out.println(myEntry.getId()+" "+myEntry.getId().getClass().getName());
-        return null;
+    public JournalEntry updateJournalEntryById(ObjectId myId, JournalEntry myEntry) {
+      JournalEntry j = getJournalEntryById(myId);
+      if(j!=null)
+      {
+        j.setTitle(myEntry.getTitle()!=null&&!myEntry.getTitle().equals("") ? myEntry.getTitle():j.getTitle());
+        j.setContent(myEntry.getContent()!=null&&!myEntry.getContent().equals("") ? myEntry.getContent():j.getContent());
       }
-      Optional<JournalEntry> j = getJournalEntryById(myId);
-      if(!j.isPresent()){
-        saveEntry(myEntry);
-        return null;
-      }
-      else{
-        JournalEntry to_be_returned = deleteJournalEntryById(myId);
-        saveEntry(myEntry);
-        return to_be_returned;
-      }
+      saveEntry(j);
+      return j;
     }
 }
