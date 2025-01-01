@@ -2,9 +2,10 @@ package com.akhilesh.journal_app.service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-
 import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.akhilesh.journal_app.entity.JournalEntry;
@@ -17,7 +18,8 @@ public class JournalEntryService {
     private JournalEntryRepo repo;
 
     public List<JournalEntry> getAllJournalEntries(){
-      return repo.findAll();
+      List<JournalEntry> all = repo.findAll();
+      return all;
     }
 
     public void saveEntry(JournalEntry journalEntry){
@@ -39,14 +41,15 @@ public class JournalEntryService {
       return null;
     }
 
-    public JournalEntry updateJournalEntryById(ObjectId myId, JournalEntry myEntry) {
+    public ResponseEntity<?> updateJournalEntryById(ObjectId myId, JournalEntry myEntry) {
       JournalEntry j = getJournalEntryById(myId);
       if(j!=null)
       {
         j.setTitle(myEntry.getTitle()!=null&&!myEntry.getTitle().equals("") ? myEntry.getTitle():j.getTitle());
         j.setContent(myEntry.getContent()!=null&&!myEntry.getContent().equals("") ? myEntry.getContent():j.getContent());
+        saveEntry(j);
+        return new ResponseEntity<>(j, HttpStatus.OK);
       }
-      saveEntry(j);
-      return j;
+      return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 }
