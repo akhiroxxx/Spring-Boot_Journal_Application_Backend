@@ -7,8 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.akhilesh.journal_app.entity.JournalEntry;
 import com.akhilesh.journal_app.entity.User;
 import com.akhilesh.journal_app.repository.JournalEntryRepo;
