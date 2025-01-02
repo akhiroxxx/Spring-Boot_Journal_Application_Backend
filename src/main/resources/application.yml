@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: journal_app
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      database: journal_app_db
+      auto-index-creation: true
+  security:
+    user:
+      name: akhil
+      password: akhil
