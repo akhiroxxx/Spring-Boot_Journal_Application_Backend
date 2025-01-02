@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.akhilesh.journal_app.entity.JournalEntry;
+import com.akhilesh.journal_app.entity.User;
 import com.akhilesh.journal_app.repository.JournalEntryRepo;
 
 @Service
@@ -17,13 +19,24 @@ public class JournalEntryService {
     @Autowired
     private JournalEntryRepo repo;
 
+    @Autowired
+    private UserService userService;
+
     public List<JournalEntry> getAllJournalEntries(){
       List<JournalEntry> all = repo.findAll();
       return all;
     }
 
-    public void saveEntry(JournalEntry journalEntry){
+
+    public void saveEntry(JournalEntry journalEntry, String userName){
+      User user = userService.findByUserName(userName);
       journalEntry.setDate(LocalDateTime.now());
+      JournalEntry savedEntry = repo.save(journalEntry);
+      user.getJournalEntries().add(savedEntry);
+      userService.saveEntry(user);
+    }
+
+    public void saveEntry(JournalEntry journalEntry){
       repo.save(journalEntry);
     }
 
@@ -31,17 +44,14 @@ public class JournalEntryService {
       return repo.findById(id).orElse(null);
     }
 
-    public JournalEntry deleteJournalEntryById(ObjectId id){
-      JournalEntry j = getJournalEntryById(id);
-      if(j!=null){
-        repo.deleteById(j.getId());
-        return j;
-      }
-      else
-      return null;
+    public void deleteJournalEntryById(ObjectId id, String userName){
+      User user = userService.findByUserName(userName);
+      user.getJournalEntries().removeIf(x->x.getId().equals(id));
+      userService.saveEntry(user);
+      repo.deleteById(id);
     }
 
-    public ResponseEntity<?> updateJournalEntryById(ObjectId myId, JournalEntry myEntry) {
+    public ResponseEntity<?> updateJournalEntryById(ObjectId myId, JournalEntry myEntry, String userName) {
       JournalEntry j = getJournalEntryById(myId);
       if(j!=null)
       {
